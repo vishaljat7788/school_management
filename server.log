@@ -1,0 +1,5 @@
+
+> school-management-node@1.0.0 start
+> node --no-warnings server.js
+
+School app running at http://localhost:3000

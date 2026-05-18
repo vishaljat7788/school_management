@@ -1,0 +1,772 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vidya Mandir - School Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="loginScreen">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="login-logo-icon"><i class="fas fa-graduation-cap"></i></div>
+      <div><h1>Vidya Mandir</h1><p>School Management System</p></div>
+    </div>
+    <div class="login-role-tabs">
+      <button class="role-tab active" onclick="switchLoginTab('admin',this)"><i class="fas fa-user-shield"></i> Admin</button>
+      <button class="role-tab" onclick="switchLoginTab('teacher',this)"><i class="fas fa-chalkboard-teacher"></i> Teacher</button>
+    </div>
+    <div id="adminForm">
+      <div class="lfg"><label>Username</label><input type="text" id="adminUser" value="admin" placeholder="admin"></div>
+      <div class="lfg"><label>Password</label><input type="password" id="adminPass" value="1234" placeholder="********"></div>
+      <button class="login-btn" onclick="doLogin('admin')"><i class="fas fa-sign-in-alt"></i> Admin Login</button>
+      <p class="login-hint">Demo: username = <b>admin</b> / password = <b>1234</b></p>
+    </div>
+    <div id="teacherForm" style="display:none;">
+      <div class="lfg"><label>Select Teacher (Assigned Class)</label>
+        <select id="teacherSel">
+          <option value="">Select a teacher</option>
+          <option value="0">Ramesh Kumar - Math - Class X-A</option>
+          <option value="1">Priya Sharma - Science - Class IX-B</option>
+          <option value="2">Anita Singh - English - Class VIII-C</option>
+          <option value="3">Suresh Patel - Hindi - Class VII-A</option>
+          <option value="4">Kavita Jain - Social Sc. - Class X-B</option>
+          <option value="5">Rajesh Verma - Computer - Class IX-A</option>
+          <option value="6">Deepa Mishra - Math - Class VIII-A &amp; IX-A</option>
+        </select>
+      </div>
+      <div class="lfg"><label>Password</label><input type="password" id="teacherPass" value="1234" placeholder="********"></div>
+      <button class="login-btn" onclick="doLogin('teacher')"><i class="fas fa-sign-in-alt"></i> Teacher Login</button>
+      <p class="login-hint">Demo: select any teacher, password = <b>1234</b><br>Teacher can take attendance only for the <b>assigned class</b></p>
+    </div>
+  </div>
+</div>
+
+<!-- APP -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-icon"><i class="fas fa-graduation-cap"></i></div>
+    <div class="logo-text"><h2>Vidya Mandir</h2><span id="sidebarLabel">Admin Panel</span></div>
+  </div>
+  <nav class="sidebar-nav" id="sidebarNav"></nav>
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="user-avatar" id="sAvatar">AD</div>
+      <div class="user-info"><p id="sName">Admin</p><span id="sRole">Principal</span></div>
+    </div>
+    <div class="logout-btn" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Logout</div>
+  </div>
+</aside>
+
+<div class="main" id="mainApp" style="display:none;">
+  <header class="header">
+    <div style="display:flex;align-items:center;gap:8px;">
+      <div class="page-title" id="pageTitle">Dashboard</div>
+      <span class="role-badge-h" id="hBadge" style="background:#e4f4ed;color:var(--success);">Admin</span>
+    </div>
+    <div class="header-right">
+      <div class="header-btn"><i class="fas fa-bell" style="font-size:15px;"></i><span class="notif-dot"></span></div>
+      <div style="display:flex;align-items:center;gap:10px;cursor:pointer;">
+        <div class="profile-avatar" id="hAvatar">AD</div>
+        <div><div style="font-size:13px;font-weight:600;" id="hName">Admin</div><div style="font-size:11px;color:var(--text3);" id="hRole">Principal</div></div>
+      </div>
+    </div>
+  </header>
+  <div class="content">
+
+    <!-- DASHBOARD -->
+    <div class="page active fade-in" id="page-dashboard">
+      <div class="stats-grid">
+        <div class="stat-card blue"><div class="stat-icon"><i class="fas fa-user-graduate"></i></div><div class="stat-value">1,248</div><div class="stat-label">Total Students</div><div class="stat-change up"><i class="fas fa-arrow-up"></i> 32 this month</div></div>
+        <div class="stat-card gold"><div class="stat-icon"><i class="fas fa-chalkboard-teacher"></i></div><div class="stat-value">64</div><div class="stat-label">Total Teachers</div><div class="stat-change up"><i class="fas fa-arrow-up"></i> 3 newly added</div></div>
+        <div class="stat-card green"><div class="stat-icon"><i class="fas fa-rupee-sign"></i></div><div class="stat-value">Rs.4.2L</div><div class="stat-label">Fees Collected</div><div class="stat-change up"><i class="fas fa-arrow-up"></i> 89.4%</div></div>
+        <div class="stat-card red"><div class="stat-icon"><i class="fas fa-times-circle"></i></div><div class="stat-value">87</div><div class="stat-label">Absent Today</div><div class="stat-change down"><i class="fas fa-arrow-down"></i> 6.9%</div></div>
+      </div>
+      <div class="grid-3">
+        <div class="card">
+          <div class="card-header"><div><div class="card-title">Weekly Attendance</div><div class="card-subtitle">Weekly attendance summary</div></div></div>
+          <div class="card-body">
+            <div class="chart-bar-wrap">
+              <div class="chart-bar-col"><div class="chart-bar-val">94%</div><div class="chart-bar" style="height:94%;background:#2a5a8c;"></div><div class="chart-bar-label">Mon</div></div>
+              <div class="chart-bar-col"><div class="chart-bar-val">91%</div><div class="chart-bar" style="height:91%;background:#2a5a8c;"></div><div class="chart-bar-label">Tue</div></div>
+              <div class="chart-bar-col"><div class="chart-bar-val">96%</div><div class="chart-bar" style="height:96%;background:var(--accent);"></div><div class="chart-bar-label">Wed</div></div>
+              <div class="chart-bar-col"><div class="chart-bar-val">89%</div><div class="chart-bar" style="height:89%;background:#2a5a8c;"></div><div class="chart-bar-label">Thu</div></div>
+              <div class="chart-bar-col"><div class="chart-bar-val">93%</div><div class="chart-bar" style="height:93%;background:#2a5a8c;"></div><div class="chart-bar-label">Fri</div></div>
+              <div class="chart-bar-col"><div class="chart-bar-val">72%</div><div class="chart-bar" style="height:72%;background:var(--border);"></div><div class="chart-bar-label">Sat</div></div>
+            </div>
+            <div style="margin-top:18px;display:flex;gap:14px;">
+              <div><div style="font-size:20px;font-weight:700;color:var(--primary)">92.3%</div><div style="font-size:11.5px;color:var(--text3)">Weekly Avg</div></div>
+              <div><div style="font-size:20px;font-weight:700;color:var(--success)">1,151</div><div style="font-size:11.5px;color:var(--text3)">Avg Present/Day</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Today's Schedule</div></div>
+          <div class="card-body" style="padding-top:8px;">
+            <div class="schedule-item"><div class="stime">08:00-08:45</div><div class="sbar" style="background:#2a5a8c;"></div><div class="sinfo"><p>Assembly</p><span>All Classes</span></div></div>
+            <div class="schedule-item"><div class="stime">09:00-10:30</div><div class="sbar" style="background:var(--accent);"></div><div class="sinfo"><p>Mathematics - X</p><span>Rm 204</span></div></div>
+            <div class="schedule-item"><div class="stime">10:45-12:00</div><div class="sbar" style="background:var(--success);"></div><div class="sinfo"><p>Science Lab - IX</p><span>Lab-B</span></div></div>
+            <div class="schedule-item"><div class="stime">12:00-12:30</div><div class="sbar" style="background:var(--border);"></div><div class="sinfo"><p>Lunch Break</p><span>Canteen</span></div></div>
+            <div class="schedule-item"><div class="stime">14:00-15:30</div><div class="sbar" style="background:var(--danger);"></div><div class="sinfo"><p>PT Meeting</p><span>Conference Hall</span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Recent Admissions</div><a class="btn btn-sm btn-primary" style="font-size:12px;text-decoration:none;" href="students.html">View All</a></div>
+          <table><thead><tr><th>Student</th><th>Class</th><th>Status</th></tr></thead><tbody>
+            <tr><td><div class="td-flex"><div class="td-avatar" style="background:#e8f0fa;color:#1a5da0;">AR</div>Aryan Rajput</div></td><td>X-A</td><td><span class="bp green">Active</span></td></tr>
+            <tr><td><div class="td-flex"><div class="td-avatar" style="background:#fae8fa;color:#7d1a8c;">PS</div>Priya Sharma</div></td><td>IX-B</td><td><span class="bp green">Active</span></td></tr>
+            <tr><td><div class="td-flex"><div class="td-avatar" style="background:#fdf3dc;color:#a06a00;">RK</div>Rohan Kumar</div></td><td>VIII-C</td><td><span class="bp gold">Pending</span></td></tr>
+          </tbody></table>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Fee Collection Status</div></div>
+          <div class="card-body">
+            <div style="margin-bottom:14px;"><div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:13px;color:var(--text2);">Class X</span><span style="font-weight:600;">94%</span></div><div class="progress-bar"><div class="progress-fill" style="width:94%;background:var(--success);"></div></div></div>
+            <div style="margin-bottom:14px;"><div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:13px;color:var(--text2);">Class IX</span><span style="font-weight:600;">88%</span></div><div class="progress-bar"><div class="progress-fill" style="width:88%;background:var(--primary-light);"></div></div></div>
+            <div><div style="display:flex;justify-content:space-between;margin-bottom:6px;"><span style="font-size:13px;color:var(--text2);">Class VIII</span><span style="font-weight:600;">76%</span></div><div class="progress-bar"><div class="progress-fill" style="width:76%;background:var(--accent);"></div></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ATTENDANCE -->
+    <div class="page fade-in" id="page-attendance">
+      <div id="attWrap"></div>
+    </div>
+
+    <!-- STUDENTS -->
+    <div class="page fade-in" id="page-students">
+      <div class="section-header">
+        <div><div class="section-title">Students</div><div class="section-sub" id="studentSubtitle">All students list</div></div>
+        <div id="studentActBtn"></div>
+      </div>
+      <div class="card"><table><thead><tr><th>Student</th><th>Roll No</th><th>Class</th><th>Gender</th><th>Phone</th><th>Fee</th><th id="studentActHead"></th></tr></thead><tbody id="studentBody"></tbody></table></div>
+    </div>
+
+    <!-- TEACHERS -->
+    <div class="page fade-in" id="page-teachers">
+      <div class="section-header">
+        <div><div class="section-title">Teachers</div><div class="section-sub">Teacher management</div></div>
+        <div id="teacherActBtn"></div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:18px;" id="teacherGrid"></div>
+    </div>
+
+    <!-- TIMETABLE -->
+    <div class="page fade-in" id="page-timetable">
+      <div class="section-header"><div><div class="section-title">Timetable</div><div class="section-sub">Timetable overview</div></div><button class="btn btn-outline"><i class="fas fa-print"></i> Print</button></div>
+      <div class="card"><div style="overflow-x:auto;"><table class="timetable">
+        <thead><tr><th style="width:100px;">Time</th><th>Monday</th><th>Tuesday</th><th>Wednesday</th><th>Thursday</th><th>Friday</th><th>Saturday</th></tr></thead>
+        <tbody>
+          <tr><td class="tc">8:00-8:45</td><td colspan="6"><div class="tts" style="background:#f3e8fa;color:#7d1a8c;display:inline-block;">Morning Assembly</div></td></tr>
+          <tr><td class="tc">8:45-9:30</td><td><div class="tts ttm">Maths</div></td><td><div class="tts tte">English</div></td><td><div class="tts tts-s">Science</div></td><td><div class="tts tth">Hindi</div></td><td><div class="tts ttm">Maths</div></td><td><div class="tts ttss">S.Sc</div></td></tr>
+          <tr><td class="tc">9:30-10:15</td><td><div class="tts tts-s">Science</div></td><td><div class="tts ttm">Maths</div></td><td><div class="tts tte">English</div></td><td><div class="tts tts-s">Science</div></td><td><div class="tts tth">Hindi</div></td><td><div class="tts" style="background:#e8e8fa;color:#3a3a9a;">Comp</div></td></tr>
+          <tr><td class="tc">10:15-10:30</td><td colspan="6"><div class="tts ttr" style="display:inline-block;">Short Break</div></td></tr>
+          <tr><td class="tc">10:30-11:15</td><td><div class="tts tth">Hindi</div></td><td><div class="tts ttss">S.Sc</div></td><td><div class="tts ttm">Maths</div></td><td><div class="tts" style="background:#e8e8fa;color:#3a3a9a;">Comp</div></td><td><div class="tts tte">English</div></td><td><div class="tts" style="background:#fae8e8;color:#9a3a3a;">Art</div></td></tr>
+          <tr><td class="tc">12:00-12:30</td><td colspan="6"><div class="tts ttr" style="display:inline-block;">Lunch Break</div></td></tr>
+        </tbody>
+      </table></div></div>
+    </div>
+
+    <!-- FEES -->
+    <div class="page fade-in" id="page-fees">
+      <div class="section-header"><div><div class="section-title">Fee Management</div><div class="section-sub">Fee management</div></div></div>
+      <div class="stats-grid">
+        <div class="stat-card green"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-value">Rs.42.1L</div><div class="stat-label">Collected</div><div class="stat-change up">87.9%</div></div>
+        <div class="stat-card red"><div class="stat-icon"><i class="fas fa-exclamation-circle"></i></div><div class="stat-value">Rs.5.8L</div><div class="stat-label">Pending</div><div class="stat-change down">156 students</div></div>
+        <div class="stat-card blue"><div class="stat-icon"><i class="fas fa-calendar-check"></i></div><div class="stat-value">Rs.8.2L</div><div class="stat-label">This Month</div><div class="stat-change up">+12%</div></div>
+        <div class="stat-card gold"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-value">43</div><div class="stat-label">Overdue</div></div>
+      </div>
+      <div class="card"><table><thead><tr><th>Student</th><th>Class</th><th>Amount</th><th>Date</th><th>Status</th></tr></thead><tbody>
+        <tr><td>Aarav Sharma</td><td>X-A</td><td style="font-weight:600;">Rs.12,500</td><td style="font-size:12px;color:var(--text3);">05 May</td><td><span class="bp green">Paid</span></td></tr>
+        <tr><td>Priya Singh</td><td>IX-B</td><td style="font-weight:600;">Rs.12,500</td><td style="font-size:12px;color:var(--text3);">04 May</td><td><span class="bp green">Paid</span></td></tr>
+        <tr><td>Rohan Kumar</td><td>VIII-C</td><td style="font-weight:600;">Rs.12,500</td><td style="font-size:12px;color:var(--text3);">02 May</td><td><span class="bp gold">Partial</span></td></tr>
+        <tr><td>Karan Malhotra</td><td>IX-A</td><td style="font-weight:600;">Rs.12,500</td><td style="font-size:12px;color:var(--text3);">-</td><td><span class="bp red">Overdue</span></td></tr>
+      </tbody></table></div>
+    </div>
+
+    <!-- RESULTS -->
+    <div class="page fade-in" id="page-results">
+      <div class="section-header"><div><div class="section-title">Results & Exams</div><div class="section-sub">Exam results</div></div></div>
+      <div class="card"><div class="card-header"><div class="card-title">Half-Yearly - Aryan Rajput - X-A</div><span class="bp green">Passed</span></div>
+      <div class="card-body">
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);"><span style="font-size:13.5px;font-weight:500;">Mathematics</span><div style="display:flex;align-items:center;gap:12px;"><span style="font-size:14px;font-weight:700;color:var(--primary);">87/100</span><span class="bp green">A</span></div></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--border);"><span style="font-size:13.5px;font-weight:500;">Science</span><div style="display:flex;align-items:center;gap:12px;"><span style="font-size:14px;font-weight:700;color:var(--primary);">91/100</span><span class="bp green">A+</span></div></div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;"><span style="font-size:13.5px;font-weight:500;">English</span><div style="display:flex;align-items:center;gap:12px;"><span style="font-size:14px;font-weight:700;color:var(--primary);">79/100</span><span class="bp blue">B+</span></div></div>
+        <div style="margin-top:16px;padding:16px;background:var(--primary);border-radius:12px;display:flex;justify-content:space-between;align-items:center;">
+          <div><div style="font-size:12px;color:rgba(255,255,255,0.6);">Total</div><div style="font-size:22px;font-weight:700;color:#fff;">257/300</div></div>
+          <div><div style="font-size:12px;color:rgba(255,255,255,0.6);">Percentage</div><div style="font-size:22px;font-weight:700;color:var(--accent-light);">85.6%</div></div>
+          <div><div style="font-size:12px;color:rgba(255,255,255,0.6);">Rank</div><div style="font-size:22px;font-weight:700;color:#fff;">5th</div></div>
+        </div>
+      </div></div>
+    </div>
+
+    <!-- NOTICE -->
+    <div class="page fade-in" id="page-notice">
+      <div class="section-header"><div><div class="section-title">Notice Board</div><div class="section-sub">Notice board</div></div><div id="noticeActBtn"></div></div>
+      <div class="card"><div class="card-body" style="padding-top:8px;">
+        <div class="notice-item"><div class="ni-icon" style="background:#fcecea;color:var(--danger);"><i class="fas fa-exclamation-triangle"></i></div><div class="ni-text"><p>Half-Yearly Examination Schedule Released</p><span>1 May 2025 - All Classes</span></div></div>
+        <div class="notice-item"><div class="ni-icon" style="background:#e8f0fa;color:var(--primary-light);"><i class="fas fa-star"></i></div><div class="ni-text"><p>Annual Sports Day - 20 May 2025</p><span>28 Apr 2025 - All Classes</span></div></div>
+        <div class="notice-item"><div class="ni-icon" style="background:#e4f4ed;color:var(--success);"><i class="fas fa-rupee-sign"></i></div><div class="ni-text"><p>Last Date for Fee Submission - 15 May</p><span>25 Apr 2025 - All Classes</span></div></div>
+        <div class="notice-item"><div class="ni-icon" style="background:#fdf3dc;color:var(--warning);"><i class="fas fa-users"></i></div><div class="ni-text"><p>Parent-Teacher Meeting - Saturday, 10 May</p><span>22 Apr 2025 - Class X, IX</span></div></div>
+      </div></div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page fade-in" id="page-settings">
+      <div class="section-header"><div><div class="section-title">Settings</div></div><button class="btn btn-primary"><i class="fas fa-save"></i> Save</button></div>
+      <div class="card"><div class="card-body"><div class="form-grid">
+        <div class="form-group form-full"><label>School Name</label><input type="text" value="Vidya Mandir Higher Secondary School"></div>
+        <div class="form-group"><label>Board</label><select><option>CBSE</option><option>ICSE</option></select></div>
+        <div class="form-group"><label>School Code</label><input type="text" value="VM-2025-GJ"></div>
+        <div class="form-group"><label>Principal</label><input type="text" value="Dr. Anita Sharma"></div>
+        <div class="form-group"><label>Phone</label><input type="text" value="+91 79 2234 5678"></div>
+        <div class="form-group form-full"><label>Address</label><textarea>123, Education Road, Satellite, Ahmedabad, Gujarat - 380015</textarea></div>
+      </div></div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL: ADD STUDENT -->
+<div class="modal-overlay" id="modalAddStudent">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Add New Student</div><span class="modal-close" onclick="closeModal('modalAddStudent')"><i class="fas fa-times"></i></span></div>
+    <div class="modal-body"><div class="form-grid">
+      <div class="form-group"><label>First Name</label><input type="text" placeholder="Aryan"></div>
+      <div class="form-group"><label>Last Name</label><input type="text" placeholder="Rajput"></div>
+      <div class="form-group"><label>Date of Birth</label><input type="date"></div>
+      <div class="form-group"><label>Gender</label><select><option>Male</option><option>Female</option></select></div>
+      <div class="form-group"><label>Class</label><select><option>X-A</option><option>X-B</option><option>IX-A</option><option>IX-B</option><option>VIII-A</option><option>VIII-C</option><option>VII-A</option></select></div>
+      <div class="form-group"><label>Phone</label><input type="text" placeholder="+91 98765 43210"></div>
+      <div class="form-group form-full"><label>Address</label><textarea placeholder="House No., Street, City..."></textarea></div>
+    </div></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalAddStudent')">Cancel</button>
+      <button class="btn btn-primary" onclick="closeModal('modalAddStudent');toast('Student added successfully!','success')"><i class="fas fa-user-plus"></i> Add Student</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: ADD TEACHER -->
+<div class="modal-overlay" id="modalAddTeacher">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Add New Teacher</div><span class="modal-close" onclick="closeModal('modalAddTeacher')"><i class="fas fa-times"></i></span></div>
+    <div class="modal-body"><div class="form-grid">
+      <div class="form-group"><label>Full Name</label><input type="text" placeholder="Dr. Ramesh Kumar"></div>
+      <div class="form-group"><label>Subject</label><select><option>Mathematics</option><option>Science</option><option>English</option><option>Hindi</option><option>Social Science</option><option>Computer</option></select></div>
+      <div class="form-group form-full"><label>Assigned Class(es)</label><select><option>X-A</option><option>X-B</option><option>IX-A</option><option>IX-B</option><option>VIII-A</option><option>VIII-C</option><option>VII-A</option></select></div>
+      <div class="form-group"><label>Experience (Years)</label><input type="number" placeholder="8"></div>
+      <div class="form-group"><label>Phone</label><input type="text" placeholder="+91 98765 43210"></div>
+      <div class="form-group"><label>Email</label><input type="email" placeholder="teacher@school.com"></div>
+    </div></div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" onclick="closeModal('modalAddTeacher')">Cancel</button>
+      <button class="btn btn-primary" onclick="closeModal('modalAddTeacher');toast('Teacher added successfully!','success')"><i class="fas fa-plus"></i> Add Teacher</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ----------------------------------
+// DATA
+// ----------------------------------
+const TEACHERS = [
+  {name:'Ramesh Kumar',  sub:'Mathematics',    qual:'M.Sc., B.Ed.', exp:12, init:'RK', bg:'#e8f0fa', tc:'#1a5da0', classes:['X-A']},
+  {name:'Priya Sharma',  sub:'Science',        qual:'M.Sc., B.Ed.', exp:8,  init:'PS', bg:'#e4f4ed', tc:'#1e7d5a', classes:['IX-B']},
+  {name:'Anita Singh',   sub:'English',        qual:'M.A., B.Ed.',  exp:15, init:'AS', bg:'#fdf3dc', tc:'#a06a00', classes:['VIII-C']},
+  {name:'Suresh Patel',  sub:'Hindi',          qual:'M.A., B.Ed.',  exp:10, init:'SP', bg:'#fcecea', tc:'#c0392b', classes:['VII-A']},
+  {name:'Kavita Jain',   sub:'Social Science', qual:'M.A., B.Ed.',  exp:7,  init:'KJ', bg:'#f3e8fa', tc:'#7d1a8c', classes:['X-B']},
+  {name:'Rajesh Verma',  sub:'Computer',       qual:'MCA, B.Ed.',   exp:5,  init:'RV', bg:'#e8e8fa', tc:'#3a3a9a', classes:['IX-A']},
+  {name:'Deepa Mishra',  sub:'Mathematics',    qual:'M.Sc., B.Ed.', exp:9,  init:'DM', bg:'#fae8fa', tc:'#8c1a7d', classes:['VIII-A','IX-A']},
+];
+
+const CLASSES = [
+  {id:'X-A',    label:'Class X - A',    count:38, clr:'#2a5a8c'},
+  {id:'X-B',    label:'Class X - B',    count:36, clr:'#e8a020'},
+  {id:'IX-A',   label:'Class IX - A',   count:40, clr:'#1e7d5a'},
+  {id:'IX-B',   label:'Class IX - B',   count:38, clr:'#7d1a8c'},
+  {id:'VIII-A', label:'Class VIII - A', count:35, clr:'#c0392b'},
+  {id:'VIII-C', label:'Class VIII - C', count:34, clr:'#3a3a9a'},
+  {id:'VII-A',  label:'Class VII - A',  count:32, clr:'#8c5a1a'},
+];
+
+const CLASS_STUDENTS = {
+  'X-A':    [{n:'Aarav Sharma',r:'01'},{n:'Ananya Patel',r:'02'},{n:'Aryan Rajput',r:'03'},{n:'Deepika Rao',r:'04'},{n:'Harshit Gupta',r:'05'},{n:'Ishaan Verma',r:'06'},{n:'Jiya Mehta',r:'07'},{n:'Kartik Singh',r:'08'}],
+  'X-B':    [{n:'Lakshmi Nair',r:'01'},{n:'Mohit Sharma',r:'02'},{n:'Naina Joshi',r:'03'},{n:'Om Patel',r:'04'},{n:'Pooja Verma',r:'05'},{n:'Rahul Kumar',r:'06'}],
+  'IX-A':   [{n:'Sachin Gupta',r:'01'},{n:'Tanya Singh',r:'02'},{n:'Uday Malhotra',r:'03'},{n:'Vanya Sharma',r:'04'},{n:'Waqar Ahmed',r:'05'},{n:'Yash Mehta',r:'06'}],
+  'IX-B':   [{n:'Zara Khan',r:'01'},{n:'Aditi Roy',r:'02'},{n:'Bharat Jain',r:'03'},{n:'Chetan Reddy',r:'04'},{n:'Divya Singh',r:'05'},{n:'Esha Gupta',r:'06'}],
+  'VIII-A': [{n:'Faiz Ansari',r:'01'},{n:'Gauri Patel',r:'02'},{n:'Hemant Rao',r:'03'},{n:'Isha Sharma',r:'04'},{n:'Jai Prakash',r:'05'}],
+  'VIII-C': [{n:'Kavya Nair',r:'01'},{n:'Lalit Kumar',r:'02'},{n:'Mansi Verma',r:'03'},{n:'Nikhil Gupta',r:'04'},{n:'Ojasvi Jain',r:'05'}],
+  'VII-A':  [{n:'Parth Mehta',r:'01'},{n:'Riya Patel',r:'02'},{n:'Shrey Agarwal',r:'03'},{n:'Tisha Roy',r:'04'},{n:'Uma Reddy',r:'05'}],
+};
+
+const STUDENTS_LIST = [
+  {name:'Aarav Sharma',  roll:'#1001',cls:'X-A',   gender:'Male',  phone:'98765 43210',fee:'green',feeLabel:'Paid'},
+  {name:'Priya Singh',   roll:'#1002',cls:'IX-B',  gender:'Female',phone:'87654 32109',fee:'green',feeLabel:'Paid'},
+  {name:'Rohan Kumar',   roll:'#1003',cls:'VIII-C',gender:'Male',  phone:'76543 21098',fee:'gold', feeLabel:'Partial'},
+  {name:'Ananya Patel',  roll:'#1004',cls:'X-A',   gender:'Female',phone:'65432 10987',fee:'green',feeLabel:'Paid'},
+  {name:'Karan Malhotra',roll:'#1005',cls:'IX-A',  gender:'Male',  phone:'54321 09876',fee:'red',  feeLabel:'Overdue'},
+  {name:'Meera Gupta',   roll:'#1006',cls:'VII-A', gender:'Female',phone:'43210 98765',fee:'green',feeLabel:'Paid'},
+  {name:'Arjun Verma',   roll:'#1007',cls:'X-B',   gender:'Male',  phone:'32109 87654',fee:'green',feeLabel:'Paid'},
+  {name:'Sneha Joshi',   roll:'#1008',cls:'VIII-A',gender:'Female',phone:'21098 76543',fee:'gold', feeLabel:'Partial'},
+];
+
+// attendance DB: key = "classId_date" -> {roll: 'P'|'A'|'L'}
+const attDB = {};
+const savedRecs = [];
+const TODAY = new Date().toISOString().split('T')[0];
+
+let role = null;       // 'admin' | 'teacher'
+let curTeacher = null; // TEACHERS[i]
+let loginTabSel = 'admin';
+let selClass = null;
+
+const PAGE_TITLES = {
+  dashboard:'Dashboard',
+  attendance:'Attendance',
+  students:'Students',
+  teachers:'Teachers',
+  timetable:'Timetable',
+  results:'Results & Exams',
+  fees:'Fee Management',
+  notice:'Notice Board',
+  settings:'Settings'
+};
+
+function currentPageFromFile(){
+  const file = (location.pathname.split('/').pop() || 'dashboard.html').replace('.html','');
+  return PAGE_TITLES[file] ? file : 'dashboard';
+}
+
+// ----------------------------------
+// LOGIN
+// ----------------------------------
+function switchLoginTab(t, btn){
+  loginTabSel = t;
+  document.querySelectorAll('.role-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('adminForm').style.display = t==='admin'?'block':'none';
+  document.getElementById('teacherForm').style.display = t==='teacher'?'block':'none';
+}
+
+function doLogin(t){
+  if(t==='admin'){
+    if(document.getElementById('adminUser').value.trim()!=='admin'||document.getElementById('adminPass').value!=='1234'){
+      toast('Invalid credentials!','danger'); return;
+    }
+    role='admin'; curTeacher=null;
+    sessionStorage.setItem('schoolRole','admin');
+    sessionStorage.removeItem('schoolTeacherIndex');
+  } else {
+    const ti=document.getElementById('teacherSel').value;
+    if(!ti){ toast('Please select a teacher!','warning'); return; }
+    if(document.getElementById('teacherPass').value!=='1234'){ toast('Invalid password!','danger'); return; }
+    role='teacher'; curTeacher=TEACHERS[+ti];
+    sessionStorage.setItem('schoolRole','teacher');
+    sessionStorage.setItem('schoolTeacherIndex',ti);
+  }
+  const ls=document.getElementById('loginScreen');
+  ls.style.opacity='0'; setTimeout(()=>ls.style.display='none',400);
+  document.getElementById('mainApp').style.display='flex';
+  selClass=null;
+  initApp();
+}
+
+function doLogout(){
+  role=null; curTeacher=null; selClass=null;
+  sessionStorage.removeItem('schoolRole');
+  sessionStorage.removeItem('schoolTeacherIndex');
+  document.getElementById('mainApp').style.display='none';
+  const ls=document.getElementById('loginScreen');
+  ls.style.display='flex'; ls.style.opacity='1';
+}
+
+function restoreLogin(){
+  const savedRole = sessionStorage.getItem('schoolRole');
+  if(savedRole==='admin'){
+    role='admin';
+    curTeacher=null;
+  } else if(savedRole==='teacher'){
+    const ti = +(sessionStorage.getItem('schoolTeacherIndex') || -1);
+    if(!TEACHERS[ti]) return;
+    role='teacher';
+    curTeacher=TEACHERS[ti];
+  } else {
+    return;
+  }
+  document.getElementById('loginScreen').style.display='none';
+  document.getElementById('mainApp').style.display='flex';
+  initApp();
+}
+
+// ----------------------------------
+// INIT
+// ----------------------------------
+function initApp(){
+  const nm = role==='admin'?'Admin':curTeacher.name;
+  const ini = nm.split(' ').map(x=>x[0]).slice(0,2).join('');
+  const rl = role==='admin'?'Principal / Admin':curTeacher.sub+' Teacher';
+
+  ['sAvatar','hAvatar'].forEach(id=>document.getElementById(id).textContent=ini);
+  document.getElementById('sName').textContent=nm;
+  document.getElementById('sRole').textContent=rl;
+  document.getElementById('hName').textContent=nm;
+  document.getElementById('hRole').textContent=rl;
+  document.getElementById('sidebarLabel').textContent=role==='admin'?'Admin Panel':'Teacher Portal';
+
+  const hb=document.getElementById('hBadge');
+  if(role==='admin'){hb.style.background='#e4f4ed';hb.style.color='var(--success)';hb.textContent='Admin';}
+  else{hb.style.background='#e8f0fa';hb.style.color='var(--primary-light)';hb.textContent='Teacher - '+curTeacher.classes.join(', ');}
+
+  buildNav();
+  const page = currentPageFromFile();
+  if(role!=='admin' && (page==='fees' || page==='settings')){
+    location.href='dashboard.html';
+    return;
+  }
+  showPage(page);
+}
+
+function buildNav(){
+  const admin = role==='admin';
+  let h='';
+  const items=[
+    {icon:'fa-home',         lbl:'Dashboard',   pg:'dashboard',  show:true},
+    {icon:'fa-clipboard-check',lbl:'Attendance',pg:'attendance', show:true},
+    {icon:'fa-user-graduate',lbl:'Students',    pg:'students',   show:true},
+    {icon:'fa-chalkboard-teacher',lbl:'Teachers',pg:'teachers',  show:true},
+    {icon:'fa-calendar-alt', lbl:'Timetable',   pg:'timetable',  show:true},
+    {sep:'Academics'},
+    {icon:'fa-chart-bar',    lbl:'Results',     pg:'results',    show:true},
+    {icon:'fa-rupee-sign',   lbl:'Fees',        pg:'fees',       show:admin, badge:admin?'3':null, bc:'rgba(192,57,43,0.5)'},
+    {sep:'Administration'},
+    {icon:'fa-bullhorn',     lbl:'Notice Board',pg:'notice',     show:true},
+    {icon:'fa-cog',          lbl:'Settings',    pg:'settings',   show:admin},
+  ];
+  items.forEach(it=>{
+    if(it.sep){h+=`<div class="nav-section-label">${it.sep}</div>`;return;}
+    const locked=!it.show;
+    h+=`<a class="nav-item${locked?' disabled':''}" href="${it.pg}.html">
+      <i class="fas ${it.icon}"></i> ${it.lbl}
+      ${it.badge?`<span class="nbadge" style="${it.bc?'background:'+it.bc:''}">${it.badge}</span>`:''}
+      ${locked?'<i class="fas fa-lock" style="margin-left:auto;font-size:11px;color:rgba(255,255,255,0.35);"></i>':''}
+    </a>`;
+  });
+  document.getElementById('sidebarNav').innerHTML=h;
+}
+
+// ----------------------------------
+// PAGE NAV
+// ----------------------------------
+function showPage(pg){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  const el=document.getElementById('page-'+pg);
+  if(el){el.classList.add('active');el.classList.remove('fade-in');void el.offsetWidth;el.classList.add('fade-in');}
+  document.querySelectorAll('.nav-item:not(.disabled)').forEach(n=>{
+    const txt={dashboard:'Dashboard',attendance:'Attendance',students:'Students',teachers:'Teachers',timetable:'Timetable',results:'Results',fees:'Fees',notice:'Notice Board',settings:'Settings'}[pg]||'';
+    n.classList.toggle('active', n.textContent.trim().startsWith(txt) && txt!=='');
+  });
+  const titles={dashboard:'Dashboard',attendance:'Attendance',students:'Students',teachers:'Teachers',timetable:'Timetable',results:'Results & Exams',fees:'Fee Management',notice:'Notice Board',settings:'Settings'};
+  document.getElementById('pageTitle').textContent=titles[pg]||pg;
+  document.title = (titles[pg]||pg) + ' - Vidya Mandir';
+  if(pg==='attendance') renderAtt();
+  if(pg==='students')   renderStudents();
+  if(pg==='teachers')   renderTeachers();
+  if(pg==='notice')     renderNotice();
+}
+
+// ----------------------------------
+// ATTENDANCE - PERMISSION SYSTEM
+// ----------------------------------
+function getAllowed(){
+  return role==='admin' ? CLASSES.map(c=>c.id) : curTeacher.classes;
+}
+
+function renderAtt(){
+  const allowed = getAllowed();
+  const admin = role==='admin';
+  let h='';
+
+  // Banner
+  if(admin){
+    h+=`<div class="att-banner">
+      <div><h2><i class="fas fa-clipboard-check" style="margin-right:10px;"></i>Attendance Management</h2>
+      <p>View and record attendance for all classes - Admin View</p></div>
+      <div style="background:rgba(255,255,255,0.15);color:#fff;padding:8px 16px;border-radius:20px;font-size:13px;font-weight:600;">Today: ${fmtDate(TODAY)}</div>
+    </div>`;
+  } else {
+    h+=`<div class="att-banner">
+      <div>
+        <h2><i class="fas fa-user-tie" style="margin-right:8px;"></i>${curTeacher.name}</h2>
+        <p>${curTeacher.sub} Teacher - You can take attendance only for your assigned class</p>
+      </div>
+      <div style="text-align:right;">
+        ${curTeacher.classes.map(c=>`<span style="background:rgba(255,255,255,0.2);color:#fff;padding:6px 14px;border-radius:20px;font-size:13px;font-weight:600;margin:3px;display:inline-block;">${className(c)}</span>`).join('')}
+      </div>
+    </div>`;
+  }
+
+  h+=`<div style="margin-bottom:10px;font-size:13px;color:var(--text2);font-weight:500;"><i class="fas fa-hand-pointer" style="margin-right:6px;color:var(--text3);"></i>Select a class to mark attendance:</div>`;
+  h+=`<div class="att-class-grid">`;
+  CLASSES.forEach(cls=>{
+    const ok = allowed.includes(cls.id);
+    const isSel = selClass===cls.id;
+    const recs = savedRecs.filter(r=>r.cls===cls.id).length;
+    h+=`<div class="acc${!ok?' locked':''}${isSel?' selected':''}" onclick="pickClass('${cls.id}')">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div class="acc-name" style="color:${cls.clr};">${className(cls.id)}</div>
+        <i class="fas ${ok?'fa-check-circle':'fa-lock'}" style="color:${ok?'var(--success)':'var(--text3)'};font-size:14px;"></i>
+      </div>
+      <div class="acc-meta">Class ${className(cls.id)}</div>
+      <div class="acc-meta">${cls.count} Students</div>
+      <div style="margin-top:10px;">
+        ${!ok?'<span class="bp gray"><i class="fas fa-lock"></i> No Access</span>':
+          recs?`<span class="bp green"><i class="fas fa-check"></i> ${recs} Saved</span>`:
+          `<span class="bp blue"><i class="fas fa-plus"></i> Mark Attendance</span>`}
+      </div>
+    </div>`;
+  });
+  h+=`</div>`;
+
+  if(selClass){
+    const cls = CLASSES.find(c=>c.id===selClass);
+    const students = CLASS_STUDENTS[selClass]||[];
+    const key = selClass+'_'+TODAY;
+    if(!attDB[key]) attDB[key]={};
+    students.forEach(s=>{ if(!attDB[key][s.r]) attDB[key][s.r]='P'; });
+    const cP=students.filter(s=>attDB[key][s.r]==='P').length;
+    const cA=students.filter(s=>attDB[key][s.r]==='A').length;
+    const cL=students.filter(s=>attDB[key][s.r]==='L').length;
+    const pct=Math.round(cP/students.length*100);
+
+    h+=`<div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title" style="display:flex;align-items:center;gap:10px;">
+            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${cls.clr};"></span>
+            Class ${className(selClass)} - Attendance Sheet
+          </div>
+          <div class="card-subtitle">
+            ${fmtDate(TODAY)}
+            ${!admin?` - Marked by: <b>${curTeacher.name}</b>`:' - Admin View'}
+          </div>
+        </div>
+        <button class="btn btn-success" onclick="saveAtt('${selClass}')"><i class="fas fa-save"></i> Save & Submit</button>
+      </div>
+      <div class="card-body">
+        <div class="att-summary">
+          <div class="att-stat"><div class="att-dot" style="background:var(--success);"></div><div><div class="att-stat-v" id="cP-${selClass}">${cP}</div><div class="att-stat-l">Present</div></div></div>
+          <div class="att-stat"><div class="att-dot" style="background:var(--danger);"></div><div><div class="att-stat-v" id="cA-${selClass}">${cA}</div><div class="att-stat-l">Absent</div></div></div>
+          <div class="att-stat"><div class="att-dot" style="background:var(--warning);"></div><div><div class="att-stat-v" id="cL-${selClass}">${cL}</div><div class="att-stat-l">Late</div></div></div>
+          <div class="att-stat"><div><div class="att-stat-v" id="cPct-${selClass}" style="color:var(--primary)">${pct}%</div><div class="att-stat-l">Attendance %</div></div></div>
+        </div>
+        <div class="mark-all">
+          <span>Mark All:</span>
+          <button class="btn btn-sm btn-outline" style="color:var(--success);border-color:var(--success);" onclick="markAll('${selClass}','P')"><i class="fas fa-check"></i> Present</button>
+          <button class="btn btn-sm btn-outline" style="color:var(--danger);border-color:var(--danger);" onclick="markAll('${selClass}','A')"><i class="fas fa-times"></i> Absent</button>
+          <button class="btn btn-sm btn-outline" style="color:var(--warning);border-color:var(--warning);" onclick="markAll('${selClass}','L')"><i class="fas fa-clock"></i> Late</button>
+        </div>
+        <table>
+          <thead><tr><th style="width:60px;">Roll</th><th>Student Name</th><th style="text-align:center;width:200px;">Mark Attendance</th><th style="text-align:center;width:80px;">Status</th></tr></thead>
+          <tbody id="attBody-${selClass}">`;
+
+    students.forEach(s=>{
+      const st = attDB[key][s.r]||'P';
+      const rowBg = st==='A'?'#fff8f8':st==='L'?'#fffef0':'';
+      h+=`<tr id="attRow-${selClass}-${s.r}" style="background:${rowBg}">
+        <td style="color:var(--text3);font-weight:600;">${s.r}</td>
+        <td>${s.n}</td>
+        <td style="text-align:center;">
+          <div class="att-toggle">
+            <button class="asb p${st==='P'?' sel':''}" onclick="setSt('${selClass}','${s.r}','P')">P</button>
+            <button class="asb a${st==='A'?' sel':''}" onclick="setSt('${selClass}','${s.r}','A')">A</button>
+            <button class="asb l${st==='L'?' sel':''}" onclick="setSt('${selClass}','${s.r}','L')">L</button>
+          </div>
+        </td>
+        <td style="text-align:center;">
+          <span class="bp ${st==='P'?'green':st==='A'?'red':'gold'}" id="stBadge-${selClass}-${s.r}">${st==='P'?'Present':st==='A'?'Absent':'Late'}</span>
+        </td>
+      </tr>`;
+    });
+
+    h+=`</tbody></table>`;
+
+    // Saved records for this class
+    const recs=savedRecs.filter(r=>r.cls===selClass);
+    if(recs.length){
+      h+=`<div style="margin-top:24px;padding-top:20px;border-top:1px solid var(--border);">
+        <div style="font-size:14px;font-weight:600;margin-bottom:12px;color:var(--text);">Saved Records - ${cls.label}</div>`;
+      recs.forEach(rec=>{
+        h+=`<div style="display:flex;align-items:center;justify-content:space-between;padding:10px 14px;background:var(--bg);border-radius:10px;margin-bottom:8px;">
+          <div>
+            <div style="font-size:13px;font-weight:600;">${fmtDate(rec.date)}</div>
+            <div style="font-size:12px;color:var(--text3);">By: ${rec.by}</div>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <span class="bp green">P: ${rec.p}</span>
+            <span class="bp red">A: ${rec.a}</span>
+            ${rec.l?`<span class="bp gold">L: ${rec.l}</span>`:''}
+            <span class="bp blue">${rec.pct}%</span>
+          </div>
+        </div>`;
+      });
+      h+=`</div>`;
+    }
+    h+=`</div></div>`;
+  }
+
+  document.getElementById('attWrap').innerHTML=h;
+}
+
+function pickClass(cid){
+  const ok = getAllowed().includes(cid);
+  if(!ok){ toast('Access denied! You cannot take attendance for this class.','danger'); return; }
+  selClass = selClass===cid ? null : cid;
+  renderAtt();
+  if(selClass) setTimeout(()=>{ const el=document.querySelector('.card'); if(el) el.scrollIntoView({behavior:'smooth',block:'start'}); },100);
+}
+
+function setSt(cid, roll, st){
+  const key=cid+'_'+TODAY;
+  attDB[key][roll]=st;
+  const row=document.getElementById(`attRow-${cid}-${roll}`);
+  if(row){
+    row.style.background = st==='A'?'#fff8f8':st==='L'?'#fffef0':'';
+    row.querySelectorAll('.asb').forEach(b=>b.classList.remove('sel'));
+    const idx={P:0,A:1,L:2}[st];
+    row.querySelectorAll('.asb')[idx].classList.add('sel');
+    const badge=document.getElementById(`stBadge-${cid}-${roll}`);
+    if(badge){
+      badge.className=`bp ${st==='P'?'green':st==='A'?'red':'gold'}`;
+      badge.textContent=st==='P'?'Present':st==='A'?'Absent':'Late';
+    }
+  }
+  updateCounts(cid);
+}
+
+function updateCounts(cid){
+  const key=cid+'_'+TODAY;
+  const sts=CLASS_STUDENTS[cid]||[];
+  const cP=sts.filter(s=>attDB[key][s.r]==='P').length;
+  const cA=sts.filter(s=>attDB[key][s.r]==='A').length;
+  const cL=sts.filter(s=>attDB[key][s.r]==='L').length;
+  const set=(id,v)=>{const e=document.getElementById(id);if(e)e.textContent=v;};
+  set(`cP-${cid}`,cP); set(`cA-${cid}`,cA); set(`cL-${cid}`,cL);
+  set(`cPct-${cid}`,Math.round(cP/sts.length*100)+'%');
+}
+
+function markAll(cid,st){ (CLASS_STUDENTS[cid]||[]).forEach(s=>setSt(cid,s.r,st)); }
+
+function saveAtt(cid){
+  const key=cid+'_'+TODAY;
+  const sts=CLASS_STUDENTS[cid]||[];
+  const cP=sts.filter(s=>attDB[key][s.r]==='P').length;
+  const cA=sts.filter(s=>attDB[key][s.r]==='A').length;
+  const cL=sts.filter(s=>attDB[key][s.r]==='L').length;
+  const pct=Math.round(cP/sts.length*100);
+  const by=role==='admin'?'Admin (Principal)':curTeacher.name;
+  const idx=savedRecs.findIndex(r=>r.cls===cid&&r.date===TODAY);
+  const rec={cls:cid,date:TODAY,p:cP,a:cA,l:cL,pct,by};
+  if(idx>=0) savedRecs[idx]=rec; else savedRecs.push(rec);
+  toast(`${className(cid)} attendance saved! Present: ${cP} | Absent: ${cA} | Late: ${cL} | ${pct}%`,'success');
+  renderAtt();
+}
+
+function fmtDate(d){
+  return new Date(d).toLocaleDateString('en-IN',{day:'2-digit',month:'short',year:'numeric'});
+}
+
+function className(value){
+  const raw = String(value || '');
+  const parts = raw.split('-');
+  const romanToNumber = {XII:12, XI:11, X:10, IX:9, VIII:8, VII:7, VI:6, V:5, IV:4, III:3, II:2, I:1};
+  const num = romanToNumber[parts[0].toUpperCase()] || Number(parts[0]);
+  if(!Number.isFinite(num) || num <= 0) return raw;
+  const suffix = num % 100 >= 11 && num % 100 <= 13 ? 'th' : ({1:'st', 2:'nd', 3:'rd'}[num % 10] || 'th');
+  return `${num}${suffix}${parts.length > 1 ? '-' + parts.slice(1).join('-') : ''}`;
+}
+
+// ----------------------------------
+// STUDENTS
+// ----------------------------------
+function renderStudents(){
+  const admin=role==='admin';
+  const list=admin?STUDENTS_LIST:STUDENTS_LIST.filter(s=>curTeacher.classes.includes(s.cls));
+  document.getElementById('studentSubtitle').textContent=admin?`All students list (${list.length} students)`:`Your class students (${list.length})`;
+  document.getElementById('studentActBtn').innerHTML=admin?`<button class="btn btn-primary" onclick="openModal('modalAddStudent')"><i class="fas fa-plus"></i> Add Student</button>`:'';
+  document.getElementById('studentActHead').textContent=admin?'Action':'';
+  const c=['#e8f0fa','#fae8fa','#fdf3dc','#e4f4ed'],tc=['#1a5da0','#7d1a8c','#a06a00','#1e7d5a'];
+  document.getElementById('studentBody').innerHTML=list.length?list.map((s,i)=>`
+    <tr>
+      <td><div class="td-flex"><div class="td-avatar" style="background:${c[i%4]};color:${tc[i%4]};">${s.name.split(' ').map(n=>n[0]).join('')}</div>${s.name}</div></td>
+      <td style="color:var(--text3);">${s.roll}</td>
+      <td>Class ${s.cls}</td>
+      <td>${s.gender}</td>
+      <td style="color:var(--text2);">${s.phone}</td>
+      <td><span class="bp ${s.fee}">${s.feeLabel}</span></td>
+      ${admin?`<td><div style="display:flex;gap:6px;">
+        <button class="btn btn-sm btn-outline btn-icon"><i class="fas fa-edit"></i></button>
+        <button class="btn btn-sm btn-outline btn-icon" style="color:var(--danger);border-color:var(--danger);"><i class="fas fa-trash"></i></button>
+      </div></td>`:''}
+    </tr>`).join(''):`<tr><td colspan="7" style="text-align:center;padding:30px;color:var(--text3);">No students found in your class</td></tr>`;
+}
+
+// ----------------------------------
+// TEACHERS
+// ----------------------------------
+function renderTeachers(){
+  const admin=role==='admin';
+  document.getElementById('teacherActBtn').innerHTML=admin?`<button class="btn btn-primary" onclick="openModal('modalAddTeacher')"><i class="fas fa-plus"></i> Add Teacher</button>`:'';
+  document.getElementById('teacherGrid').innerHTML=TEACHERS.map(t=>`
+    <div class="card" style="cursor:pointer;transition:transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform=''">
+      <div class="card-body" style="display:flex;flex-direction:column;align-items:center;text-align:center;padding:24px 20px;">
+        <div style="width:58px;height:58px;border-radius:50%;background:${t.bg};color:${t.tc};display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;margin-bottom:12px;">${t.init}</div>
+        <div style="font-size:15px;font-weight:700;color:var(--text);">${t.name}</div>
+        <div style="font-size:12.5px;color:var(--text3);margin-top:2px;">${t.sub} Teacher</div>
+        <div style="font-size:12px;color:var(--text3);">${t.qual}</div>
+        <div style="margin-top:10px;display:flex;gap:6px;flex-wrap:wrap;justify-content:center;">
+          ${t.classes.map(c=>`<span class="bp blue">Class ${c}</span>`).join('')}
+        </div>
+        <div style="margin-top:6px;"><span class="bp gray">${t.exp} yrs exp</span></div>
+        ${curTeacher&&curTeacher.name===t.name?'<div style="margin-top:8px;"><span class="bp green"><i class="fas fa-user-check"></i> You</span></div>':''}
+        ${admin?`<div style="display:flex;gap:8px;margin-top:14px;"><button class="btn btn-sm btn-outline"><i class="fas fa-edit"></i> Edit</button><button class="btn btn-sm btn-primary">View</button></div>`:''}
+      </div>
+    </div>`).join('');
+}
+
+// ----------------------------------
+// NOTICE
+// ----------------------------------
+function renderNotice(){
+  const admin=role==='admin';
+  document.getElementById('noticeActBtn').innerHTML=admin?`<button class="btn btn-primary"><i class="fas fa-plus"></i> New Notice</button>`:'';
+}
+
+// ----------------------------------
+// UTILS
+// ----------------------------------
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+document.querySelectorAll('.modal-overlay').forEach(m=>m.addEventListener('click',e=>{ if(e.target===m) m.classList.remove('open'); }));
+
+function toast(msg,type='success'){
+  const clr={success:'var(--success)',danger:'var(--danger)',warning:'var(--warning)'};
+  const t=document.createElement('div');
+  t.style.cssText=`position:fixed;bottom:24px;right:24px;background:${clr[type]};color:#fff;padding:13px 20px;border-radius:12px;font-size:13.5px;font-weight:500;box-shadow:0 8px 24px rgba(0,0,0,0.18);z-index:9999;animation:fadeIn 0.3s ease;max-width:400px;line-height:1.5;`;
+  t.innerHTML=msg;
+  document.body.appendChild(t);
+  setTimeout(()=>{t.style.opacity='0';t.style.transition='opacity 0.3s';setTimeout(()=>t.remove(),300);},4000);
+}
+
+restoreLogin();
+</script>
+</body>
+</html>
