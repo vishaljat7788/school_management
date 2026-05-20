@@ -10,9 +10,13 @@ const pages = {
   fees: 'Fee Management',
   notice: 'Notice Board',
   settings: 'Settings',
+  transport: 'Transport',
+  library: 'Library',
+  homework: 'Homework',
+  staff: 'Staff & Payroll',
 };
 
-function nav(user, active) {
+function nav(user, active, pendingCounts) {
   const isAdmin = user.role === 'admin';
   const isTeacher = user.role === 'teacher';
   const isStudent = user.role === 'student';
@@ -23,18 +27,51 @@ function nav(user, active) {
     ['fa-user-graduate', 'Students', 'students', isAdmin || isTeacher],
     ['fa-chalkboard-teacher', 'Teachers', 'teachers', isAdmin || isTeacher],
     ['fa-calendar-alt', 'Timetable', 'timetable', true],
+    ['fa-bus', 'Transport', 'transport', true],
     ['sep', 'Academics'],
+    ['fa-book-open', 'Homework', 'homework', true],
+    ['fa-book', 'Library', 'library', true],
     ['fa-chart-bar', 'Results', 'results', true],
     ['fa-rupee-sign', 'Fees', 'fees', isAdmin || isStudent],
     ['sep', 'Administration'],
+    ['fa-users-cog', 'Staff & Payroll', 'staff', isAdmin || isTeacher],
     ['fa-bullhorn', 'Notice Board', 'notice', true],
     ['fa-cog', 'Settings', 'settings', isAdmin],
   ];
-  return items.map((it) => {
+  // Filter out disallowed menu items
+  const filtered = items.filter(it => it[0] === 'sep' || it[3]);
+
+  // Filter out empty section headers
+  const result = [];
+  for (let i = 0; i < filtered.length; i++) {
+    if (filtered[i][0] === 'sep') {
+      let hasContent = false;
+      for (let j = i + 1; j < filtered.length; j++) {
+        if (filtered[j][0] === 'sep') break;
+        hasContent = true;
+      }
+      if (hasContent) {
+        result.push(filtered[i]);
+      }
+    } else {
+      result.push(filtered[i]);
+    }
+  }
+
+  return result.map((it) => {
     if (it[0] === 'sep') return `<div class="nav-section-label">${it[1]}</div>`;
-    const disabled = !it[3];
-    return `<a class="nav-item${active === it[2] ? ' active' : ''}${disabled ? ' disabled' : ''}" href="/${it[2]}">
-      <i class="fas ${it[0]}"></i> ${it[1]}${disabled ? '<i class="fas fa-lock" style="margin-left:auto;font-size:11px;color:rgba(255,255,255,0.35);"></i>' : ''}
+    
+    let badgeHtml = '';
+    if (isAdmin) {
+      if (it[2] === 'transport' && pendingCounts?.transport > 0) {
+        badgeHtml = `<span style="background: var(--danger); color: white; border-radius: 50%; font-size: 11px; padding: 2px 6px; font-weight: bold; margin-left: 8px; display: inline-block; min-width: 18px; text-align: center;">${pendingCounts.transport}</span>`;
+      } else if (it[2] === 'staff' && pendingCounts?.leaves > 0) {
+        badgeHtml = `<span style="background: var(--danger); color: white; border-radius: 50%; font-size: 11px; padding: 2px 6px; font-weight: bold; margin-left: 8px; display: inline-block; min-width: 18px; text-align: center;">${pendingCounts.leaves}</span>`;
+      }
+    }
+
+    return `<a class="nav-item${active === it[2] ? ' active' : ''}" href="/${it[2]}">
+      <i class="fas ${it[0]}"></i> ${it[1]}${badgeHtml}
     </a>`;
   }).join('');
 }
@@ -73,11 +110,13 @@ function layout(req, page, content) {
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link rel="stylesheet" href="/css/style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 <body>
 <aside class="sidebar">
   <div class="sidebar-logo"><div class="logo-icon"><i class="fas fa-graduation-cap"></i></div><div class="logo-text"><h2>Vidya Mandir</h2><span>${portalLabel(user)}</span></div></div>
-  <nav class="sidebar-nav">${nav(user, page)}</nav>
+  <nav class="sidebar-nav">${nav(user, page, { transport: req.pendingTransportCount || 0, leaves: req.pendingLeaveCount || 0 })}</nav>
   <div class="sidebar-footer"><div class="sidebar-user"><div class="user-avatar">${initials(user.display_name)}</div><div class="user-info"><p>${e(user.display_name)}</p><span>${e(rl)}</span></div></div><a class="logout-btn" href="/logout"><i class="fas fa-sign-out-alt"></i> Logout</a></div>
 </aside>
 <div class="main" style="display:flex;">
