@@ -1,23 +1,17 @@
 const { createApp } = require('./src/app');
 const { initDb } = require('./src/config/database');
 
-const app = createApp();
+const PORT = process.env.PORT || 3001;
 
-// For local development
-if (require.main === module) {
-  const PORT = process.env.PORT || 3001;
-  initDb().then(() => {
-    app.listen(PORT, () => {
-      console.log(`School app running at http://localhost:${PORT}`);
-    });
-  }).catch((err) => {
-    console.error('Failed to start app:', err);
-    process.exit(1);
+async function start() {
+  await initDb();
+  const app = createApp();
+  app.listen(PORT, () => {
+    console.log(`School app running at http://localhost:${PORT}`);
   });
 }
 
-// For Vercel Serverless Function
-module.exports = async (req, res) => {
-  await initDb();
-  return app(req, res);
-};
+start().catch((err) => {
+  console.error('Failed to start app:', err);
+  process.exit(1);
+});
