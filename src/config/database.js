@@ -24,6 +24,9 @@ const Leave = require('../models/Leave');
 const Payroll = require('../models/Payroll');
 
 async function initDb() {
+  if (mongoose.connection.readyState === 1) {
+    return;
+  }
   await mongoose.connect(process.env.MONGO_URI);
   console.log('Connected to MongoDB Atlas');
   
