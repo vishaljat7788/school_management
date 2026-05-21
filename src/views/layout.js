@@ -121,14 +121,19 @@ function layout(req, page, content) {
 </aside>
 <div class="main" style="display:flex;">
   <header class="header">
-    <div style="display:flex;align-items:center;gap:8px;"><div class="page-title">${pages[page]}</div><span class="role-badge-h" style="background:${hb.bg};color:${hb.color};">${e(hb.label)}</span></div>
-    <div class="header-right"><div class="header-btn"><i class="fas fa-bell" style="font-size:15px;"></i><span class="notif-dot"></span></div><div style="display:flex;align-items:center;gap:10px;"><div class="profile-avatar">${initials(user.display_name)}</div><div><div style="font-size:13px;font-weight:600;">${e(user.display_name)}</div><div style="font-size:11px;color:var(--text3);">${e(rl)}</div></div></div></div>
+    <div style="display:flex;align-items:center;gap:8px;">
+      <button class="hamburger" onclick="document.querySelector('.sidebar').classList.add('open'); document.getElementById('sidebarOverlay').classList.add('open');"><i class="fas fa-bars"></i></button>
+      <div class="page-title">${pages[page]}</div>
+      <span class="role-badge-h" style="background:${hb.bg};color:${hb.color};">${e(hb.label)}</span>
+    </div>
+    <div class="header-right"><div class="header-btn"><i class="fas fa-bell" style="font-size:15px;"></i><span class="notif-dot"></span></div><div style="display:flex;align-items:center;gap:10px;"><div class="profile-avatar">${initials(user.display_name)}</div><div class="h-name-role"><div style="font-size:13px;font-weight:600;">${e(user.display_name)}</div><div style="font-size:11px;color:var(--text3);">${e(rl)}</div></div></div></div>
   </header>
   <div class="content">
     ${flash ? `<div class="bp ${flash.type === 'danger' ? 'red' : flash.type === 'warning' ? 'gold' : 'green'}" style="margin-bottom:18px;">${e(flash.message)}</div>` : ''}
     ${content}
   </div>
 </div>
+<div id="sidebarOverlay" class="mobile-overlay" onclick="document.querySelector('.sidebar').classList.remove('open'); this.classList.remove('open');"></div>
 </body>
 </html>`;
 }
