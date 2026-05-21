@@ -27,7 +27,11 @@ async function initDb() {
   if (mongoose.connection.readyState === 1) {
     return;
   }
-  await mongoose.connect(process.env.MONGO_URI);
+  await mongoose.connect(process.env.MONGO_URI, {
+    maxPoolSize: 10,
+    serverSelectionTimeoutMS: 5000,
+    socketTimeoutMS: 45000,
+  });
   console.log('Connected to MongoDB Atlas');
   
   const count = await Class.countDocuments();
