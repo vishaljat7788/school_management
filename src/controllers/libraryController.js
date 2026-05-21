@@ -5,6 +5,8 @@ const { layout, modal } = require('../views/layout');
 const { e, fmtDate, className } = require('../utils/format');
 
 async function library(req, res) {
+  const userRole = req.session.user.role;
+  const isAdminOrTeacher = userRole === 'admin' || userRole === 'teacher';
   const books = await LibraryBook.find().sort({ title: 1 });
   const issues = await LibraryIssue.find()
     .populate('book', 'title')
@@ -29,8 +31,8 @@ async function library(req, res) {
         <div class="section-sub">Manage books, issues, and returns</div>
       </div>
       <div style="display:flex;gap:10px;">
-        <button class="btn btn-outline" onclick="document.getElementById('modalIssueBook').classList.add('open')"><i class="fas fa-hand-holding-medical"></i> Issue Book</button>
-        <button class="btn btn-primary" onclick="document.getElementById('modalAddBook').classList.add('open')"><i class="fas fa-plus"></i> Add Book</button>
+        ${isAdminOrTeacher ? `<button class="btn btn-outline" onclick="document.getElementById('modalIssueBook').classList.add('open')"><i class="fas fa-hand-holding-medical"></i> Issue Book</button>
+        <button class="btn btn-primary" onclick="document.getElementById('modalAddBook').classList.add('open')"><i class="fas fa-plus"></i> Add Book</button>` : ''}
       </div>
     </div>
     
@@ -55,7 +57,7 @@ async function library(req, res) {
       <div class="card">
         <div class="card-header"><div class="card-title">Recent Issues</div></div>
         <table>
-          <thead><tr><th>Book</th><th>Student</th><th>Status</th><th>Due Date</th><th>Action</th></tr></thead>
+          <thead><tr><th>Book</th><th>Student</th><th>Status</th><th>Due Date</th>${isAdminOrTeacher ? '<th>Action</th>' : ''}</tr></thead>
           <tbody>
             ${issuesMapped.map(i => `
               <tr>
@@ -63,12 +65,12 @@ async function library(req, res) {
                 <td>${e(i.student_name)} <span style="font-size:11px;color:var(--text3);">(${e(className(i.student_class))})</span></td>
                 <td><span class="bp ${i.status === 'Issued' ? 'blue' : i.status === 'Returned' ? 'green' : 'red'}">${e(i.status)}</span></td>
                 <td>${fmtDate(i.due_date)}</td>
-                <td>
+                ${isAdminOrTeacher ? `<td>
                   ${i.status === 'Issued' ? `<form method="post" action="/library/return/${i.id}" style="display:inline;" onsubmit="return confirm('Confirm return of this book?');"><button class="btn btn-sm btn-outline" style="color:var(--success);border-color:var(--success);"><i class="fas fa-undo"></i> Return</button></form>` : '-'}
-                </td>
+                </td>` : ''}
               </tr>
             `).join('')}
-            ${issuesMapped.length === 0 ? '<tr><td colspan="5" style="text-align:center;">No recent issues</td></tr>' : ''}
+            ${issuesMapped.length === 0 ? `<tr><td colspan="${isAdminOrTeacher ? '5' : '4'}" style="text-align:center;">No recent issues</td></tr>` : ''}
           </tbody>
         </table>
       </div>

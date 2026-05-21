@@ -241,6 +241,14 @@ async function students(req, res) {
 
 async function addStudent(req, res) {
   const { name, roll_no, class_id, gender, father_name, mother_name, phone, address } = req.body;
+  
+  // Check if roll number already exists
+  const existing = await Student.findOne({ roll_no });
+  if (existing) {
+    req.session.flash = { type: 'danger', message: `Roll number ${roll_no} is already assigned to ${existing.name}.` };
+    return res.redirect('/students');
+  }
+
   const fee_status = req.body.fee_status || 'Paid';
   const result = await Student.create({ name, roll_no, class_id, gender, father_name: father_name || '', mother_name: mother_name || '', phone, fee_status, address });
   const paid = fee_status === 'Paid' ? 12500 : fee_status === 'Pending' ? 6500 : 0;

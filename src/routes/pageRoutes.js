@@ -47,7 +47,7 @@ router.post('/transport/delete-route', requireLogin, requireAdmin, transportCont
 router.post('/transport/remove-student', requireLogin, requireAdmin, transportController.removeStudent);
 
 router.get('/library', requireLogin, libraryController.library);
-router.post('/library', requireLogin, libraryController.addBook);
+router.post('/library', requireLogin, requireAdminOrTeacher, libraryController.addBook);
 router.post('/library/issue', requireLogin, requireAdminOrTeacher, libraryController.issueBook);
 router.post('/library/return/:id', requireLogin, requireAdminOrTeacher, libraryController.returnBook);
 
