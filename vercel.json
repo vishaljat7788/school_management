@@ -8,6 +8,10 @@
   ],
   "rewrites": [
     {
+      "source": "/css/(.*)",
+      "destination": "/public/css/$1"
+    },
+    {
       "source": "/(.*)",
       "destination": "/api/index.js"
     }
