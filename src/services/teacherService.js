@@ -9,7 +9,7 @@ async function getTeacherClasses(teacherId) {
 }
 
 async function canAccessClass(user, classId) {
-  if (user.role === 'admin') return true;
+  if (user.role === 'admin' || user.role === 'teacher') return true;
   const classes = await getTeacherClasses(user.teacher_id);
   return classes.some((c) => String(c._id) === classId);
 }

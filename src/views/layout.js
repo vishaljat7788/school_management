@@ -25,7 +25,7 @@ function nav(user, active, pendingCounts) {
     ['fa-home', 'Dashboard', 'dashboard', true],
     ['fa-clipboard-check', 'Attendance', 'attendance', isAdmin || isTeacher],
     ['fa-user-graduate', 'Students', 'students', isAdmin || isTeacher],
-    ['fa-chalkboard-teacher', 'Teachers', 'teachers', isAdmin || isTeacher],
+    ['fa-chalkboard-teacher', 'Teachers', 'teachers', isAdmin],
     ['fa-calendar-alt', 'Timetable', 'timetable', true],
     ['fa-bus', 'Transport', 'transport', true],
     ['sep', 'Academics'],

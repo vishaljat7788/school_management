@@ -14,6 +14,7 @@ const { e, feeClass, fmtDate, initials, money, today, className } = require('../
 async function dashboard(req, res) {
   const user = req.session.user;
   const isStudent = user.role === 'student';
+  const isTeacher = user.role === 'teacher';
 
   if (isStudent) {
     const studentId = user.student_id;
@@ -54,6 +55,47 @@ async function dashboard(req, res) {
           </div>
         </div>
       </div>`));
+  } else if (isTeacher) {
+    const notices = await Notice.find().sort({ notice_date: -1 }).limit(4);
+    const teacherClasses = user.classes || [];
+    const totalClasses = teacherClasses.length;
+    res.send(layout(req, 'dashboard', `
+      <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr);">
+        <div class="stat-card blue"><div class="stat-icon"><i class="fas fa-chalkboard"></i></div><div class="stat-value">${totalClasses}</div><div class="stat-label">Assigned Classes</div></div>
+        <div class="stat-card gold"><div class="stat-icon"><i class="fas fa-book"></i></div><div class="stat-value">${e(user.subject || 'All')}</div><div class="stat-label">Primary Subject</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-header"><div class="card-title">Notice Board</div></div>
+          <div class="card-body">
+            ${notices.length ? notices.map((n) => `<div class="notice-item"><div class="ni-icon" style="background:#e8f0fa;color:var(--primary-light);"><i class="fas fa-bullhorn"></i></div><div class="ni-text"><p>${e(n.title)}</p><span>${fmtDate(n.notice_date)} - ${e(n.audience)}</span></div></div>`).join('') : '<div style="padding: 20px; text-align: center; color: var(--text3);">No recent notices</div>'}
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header"><div class="card-title">Attendance Trends</div></div>
+          <div class="card-body"><canvas id="attendanceChart" style="max-height:250px;"></canvas></div>
+        </div>
+      </div>
+      <script>
+        document.addEventListener('DOMContentLoaded', () => {
+          const attCtx = document.getElementById('attendanceChart');
+          if (attCtx) {
+            new Chart(attCtx, {
+              type: 'bar',
+              data: {
+                labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+                datasets: [{
+                  label: 'Attendance %',
+                  data: [94, 91, 96, 89, 93, 72],
+                  backgroundColor: '#2a5a8c',
+                  borderRadius: 6
+                }]
+              },
+              options: { maintainAspectRatio: false, scales: { y: { min: 0, max: 100 } } }
+            });
+          }
+        });
+      </script>`));
   } else {
     const feesAggr = await Fee.aggregate([{ $group: { _id: null, total: { $sum: '$paid_amount' } } }]);
     const stats = {
@@ -516,7 +558,7 @@ async function teachers(req, res) {
 async function attendance(req, res) {
   const user = req.session.user;
   const attendanceDate = normalizeDate(req.query.date);
-  const classFilter = user.role === 'admin' ? {} : { _id: { $in: user.classes } };
+  const classFilter = user.role === 'admin' || user.role === 'teacher' ? {} : { _id: { $in: user.classes } };
   const classesRaw = await Class.find(classFilter).sort({ _id: 1 });
   const classes = await Promise.all(classesRaw.map(async c => {
     const total_students = await Student.countDocuments({ class_id: String(c._id) });
@@ -561,7 +603,7 @@ function attendanceMarkup({ user, classes, classId, attendanceDate, month, month
     : '';
 
   return `
-    <div class="att-banner"><div><h2><i class="fas fa-clipboard-check" style="margin-right:10px;"></i>Attendance Management</h2><p>${user.role === 'admin' ? 'View and record attendance for database classes.' : 'You can take attendance only for your assigned classes.'}</p></div><div style="color:#fff;font-weight:600;">Today: ${attendanceDate}</div></div>
+    <div class="att-banner"><div><h2><i class="fas fa-clipboard-check" style="margin-right:10px;"></i>Attendance Management</h2><p>${user.role === 'admin' || user.role === 'teacher' ? 'View and record attendance for all classes.' : 'You can take attendance only for your assigned classes.'}</p></div><div style="color:#fff;font-weight:600;">Today: ${attendanceDate}</div></div>
     <div class="section-header"><div><div style="font-size:13px;color:var(--text2);font-weight:500;"><i class="fas fa-hand-pointer" style="margin-right:6px;color:var(--text3);"></i>Select a class to mark attendance:</div><div class="section-sub">${classes.length} classes loaded from database</div></div>${addClassButton}</div>
     <div class="att-class-grid">${classes.map((c) => `<a class="acc${c.id === classId ? ' selected' : ''}" style="text-decoration:none;color:inherit;" href="/attendance?class=${e(c.id)}&month=${e(month)}&date=${e(attendanceDate)}"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;"><div class="acc-name" style="color:${c.color || '#2a5a8c'};">${e(className(c.id))}</div><i class="fas fa-check-circle" style="color:var(--success);font-size:14px;"></i></div><div class="acc-meta">Class ${e(className(c.id))}</div><div class="acc-meta">${Number(c.total_students || 0)} Students</div><div style="margin-top:10px;"><span class="bp blue"><i class="fas fa-plus"></i> Mark Attendance</span></div></a>`).join('')}</div>
     ${classes.length ? '' : `<div class="card"><div class="card-body" style="text-align:center;color:var(--text3);padding:34px;">No classes found in database.</div></div>`}
